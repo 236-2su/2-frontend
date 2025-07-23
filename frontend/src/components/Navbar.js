@@ -239,7 +239,7 @@ const Navbar = () => {
             ) : (
               <button
                 onClick={() => navigate('/login')}
-                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold px-6 py-2.5 rounded-full text-sm transition-all duration-300 transform hover:scale-105"
+                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold px-6 py-2.5 rounded-2xl text-sm transition-all duration-300 transform hover:scale-105"
               >
                 로그인
               </button>

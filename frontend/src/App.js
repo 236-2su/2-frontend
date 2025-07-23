@@ -10,6 +10,7 @@ import HomePage from './pages/HomePage';
 import HomeLoggedInPage from './pages/HomeLoggedInPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
+import SignupComplete from './pages/SignupComplete';
 
 import ExpertsPage from './pages/ExpertsPage';
 import ProductsPage from './pages/ProductsPage';
@@ -22,7 +23,7 @@ import FavoritesPage from './pages/FavoritesPage';
 import SignupChoicePage from './pages/SignupChoicePage';
 import SearchPage from './pages/SearchPage';
 // Navbar를 숨길 페이지 목록
-const hideNavbarRoutes = ['/login', '/signup', '/SignupChoicePage'];
+const hideNavbarRoutes = ['/login', '/signup', '/SignupChoicePage', '/signup-complete'];
 
 function AppContent() {
   const location = useLocation();
@@ -36,6 +37,7 @@ function AppContent() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/signup-complete" element={<SignupComplete />} />
 
         <Route path="/SignupChoicePage" element={<SignupChoicePage />} />
         <Route path="/search" element={<SearchPage />} />

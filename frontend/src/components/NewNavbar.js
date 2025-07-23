@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import stalkLogoBlue from '../assets/Stalk_logo_blue.svg';
+import stalkLogoBlue from '../assets/stalk_logo_blue.svg';
 
 const NewNavbar = ({ userType, onUserTypeChange, showUserTypeToggle = false }) => {
   const navigate = useNavigate();
@@ -8,9 +8,17 @@ const NewNavbar = ({ userType, onUserTypeChange, showUserTypeToggle = false }) =
 
   return (
     <nav className="w-full h-20 flex items-center justify-between relative px-5 mb-10">
-      <Link to="/">
-        <img src={stalkLogoBlue} alt="Stalk Logo" className="w-36 h-12" />
-      </Link>
+       {/* Brand Logo */}
+          <div className="flex items-center">
+            <button 
+              onClick={() => navigate('/')}
+              className="flex items-center space-x-2 hover:opacity-80 transition-opacity duration-300"
+            >
+              
+              <img src={stalkLogoBlue} alt="Stalk Logo" className="w-30 h-10" />
+            </button>
+            
+          </div>
       
       <div className="flex items-center gap-4">
         {/* User Type Toggle - Only show when showUserTypeToggle is true */}
@@ -40,14 +48,10 @@ const NewNavbar = ({ userType, onUserTypeChange, showUserTypeToggle = false }) =
         )}
         
         <button 
-          className={`w-10 h-10 cursor-pointer text-3xl border-none rounded-full transition-colors duration-300 flex items-center justify-center pb-1 ${
-            isHovered ? 'bg-gray-100' : 'bg-transparent'
-          }`}
-          onClick={() => navigate('/')}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
+          onClick={() => navigate('/login')}
+          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold px-6 py-2.5 rounded-2xl text-sm transition-all duration-300 transform hover:scale-105"
         >
-          &times;
+          로그인
         </button>
       </div>
     </nav>

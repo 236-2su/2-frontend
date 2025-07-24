@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Footer from '../components/Footer';
 
 const WritePostPage = () => {
   const navigate = useNavigate();
@@ -131,7 +130,6 @@ const WritePostPage = () => {
           </form>
         </div>
       </main>
-      <Footer />
     </div>
   );
 };

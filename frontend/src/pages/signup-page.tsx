@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import NewNavbar from '../components/NewNavbar';
-import Footer from '../components/Footer';
+import NewNavbar from '../components/new-navbar';
 import certificationExample from '../assets/certification_example.svg';
 import stalkLogoBlue from '../assets/stalk_logo_blue.svg';
 
@@ -779,8 +778,6 @@ const SignupPage = () => {
           </div>
         </div>
       )}
-
-      <Footer />
     </div>
   );
 };

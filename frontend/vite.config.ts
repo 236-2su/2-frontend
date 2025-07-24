@@ -6,15 +6,9 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
-    open: true,
-    historyApiFallback: true
+    open: true
   },
   build: {
     outDir: 'build'
-  },
-  esbuild: {
-    loader: 'jsx',
-    include: /src\/.*\.jsx?$/,
-    exclude: []
   }
 }) 

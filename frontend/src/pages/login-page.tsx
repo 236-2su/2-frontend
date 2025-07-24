@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import NewNavbar from '../components/NewNavbar';
-import Footer from '../components/Footer';
+import NewNavbar from '../components/new-navbar';
 import googleIcon from '../assets/google_icon.svg';
 import naverIcon from '../assets/naver_icon.svg';
 import kakaoIcon from '../assets/kakao_icon.svg';
@@ -147,7 +146,6 @@ const LoginPage = () => {
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   );
 };

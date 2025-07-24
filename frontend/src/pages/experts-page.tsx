@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Footer from '../components/Footer';
 import stalkLogoBlue from '../assets/Stalk_logo_blue.svg';
 
 const ExpertsPage = () => {
@@ -189,7 +188,6 @@ const ExpertsPage = () => {
         </div>
       </div>
 
-      <Footer />
     </div>
   );
 };

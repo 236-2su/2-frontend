@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Footer from '../components/Footer';
 
 const FavoritesPage = () => {
   const navigate = useNavigate();
@@ -135,7 +134,6 @@ const FavoritesPage = () => {
         </div>
       </main>
 
-      <Footer />
     </div>
   );
 };

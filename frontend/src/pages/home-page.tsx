@@ -1,7 +1,6 @@
 import React from 'react';
-import AdBanner from '../components/AdBanner';
-import MonthlyExperts from '../components/MonthlyExperts';
-import Footer from '../components/Footer';
+import AdBanner from '../components/ad-banner';
+import MonthlyExperts from '../components/monthly-experts';
 
 const HomePage = () => {
   return (
@@ -10,7 +9,6 @@ const HomePage = () => {
         <AdBanner />
         <MonthlyExperts />
       </main>
-      <Footer />
     </div>
   );
 };

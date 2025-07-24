@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import NewNavbar from '../components/NewNavbar';
+import NewNavbar from '../components/new-navbar';
 import normalUserIcon from '../assets/normal_user.svg';
 import specialistIcon from '../assets/specialist.svg';
 

@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Footer from '../components/Footer';
+import NewNavbar from '../components/new-navbar';
 import stalkLogoBlue from '../assets/Stalk_logo_blue.svg';
 
 const MyPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('내 정보');
   const [consultationTab, setConsultationTab] = useState('상담 전');
+  
+  // 전문가 여부 확인 (DB 연결 전 임시 변수)
+  const isExpert = true; // true: 전문가, false: 일반 사용자
   
   // Modal states
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -20,7 +23,9 @@ const MyPage = () => {
     name: '김싸피',
     contact: '010-0000-0000',
     email: 'ssafy@samsung.com',
-    nickname: '날으는 짱구'
+    nickname: '김싸피',
+    qualification: '투자자산운용사',
+    isApproved: true
   };
 
   // Form states
@@ -46,11 +51,20 @@ const MyPage = () => {
     selectedFile: null
   });
 
-  const tabs = [
+  const generalTabs = [
     { id: '내 정보', label: '내 정보' },
     { id: '내 상담 내역', label: '내 상담 내역' },
     { id: '찜한 전문가', label: '찜한 전문가' }
   ];
+
+  const expertTabs = [
+    { id: '내 정보', label: '내 정보' },
+    { id: '내 상담 내역', label: '내 상담 내역' },
+    { id: '전문가 페이지 수정', label: '전문가 페이지 수정' },
+    { id: '상담 영업 스케줄 관리', label: '상담 영업 스케줄 관리' }
+  ];
+
+  const tabs = isExpert ? expertTabs : generalTabs;
 
   const consultationData = {
     '상담 전': [
@@ -131,41 +145,7 @@ const MyPage = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center">
-            <img src={stalkLogoBlue} alt="Stalk" className="h-8" />
-          </div>
-
-          {/* Navigation Links */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <a href="#" className="text-gray-700 hover:text-blue-600 transition-colors">투자 전문가</a>
-            <a href="#" className="text-gray-700 hover:text-blue-600 transition-colors">상품 조회</a>
-            <a href="#" className="text-gray-700 hover:text-blue-600 transition-colors">커뮤니티</a>
-          </nav>
-
-          {/* Search Bar */}
-          <div className="flex-1 max-w-md mx-8">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="원하는 투자 전문가를 검색해보세요"
-                className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-              <svg className="absolute right-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-          </div>
-
-          {/* User Profile Icon */}
-          <div className="w-8 h-8 bg-orange-400 rounded-full flex items-center justify-center">
-            <span className="text-white text-sm font-medium">👤</span>
-          </div>
-        </div>
-      </header>
+      <NewNavbar userType={isExpert ? 'expert' : 'general'} />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-8">
@@ -223,13 +203,32 @@ const MyPage = () => {
                       <span className="text-gray-900 font-medium">{userInfo.name}</span>
                     </div>
                     <div className="flex justify-between items-center py-3 border-b border-gray-100">
-                      <span className="text-gray-600">연락처</span>
+                      <span className="text-gray-600">휴대폰 번호</span>
                       <span className="text-gray-900 font-medium">{userInfo.contact}</span>
                     </div>
-                    <div className="flex justify-between items-center py-3">
+                    <div className="flex justify-between items-center py-3 border-b border-gray-100">
                       <span className="text-gray-600">이메일 주소</span>
                       <span className="text-gray-900 font-medium">{userInfo.email}</span>
                     </div>
+                    {isExpert && (
+                      <div className="flex justify-between items-center py-3">
+                        <span className="text-gray-600">전문 자격 증명</span>
+                        <div className="flex items-center space-x-2">
+                          <span className="text-gray-900 font-medium">{userInfo.qualification}</span>
+                          {userInfo.isApproved && (
+                            <>
+                              <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                              <span className="text-blue-600 text-sm font-medium">승인</span>
+                              <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                              </svg>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -247,7 +246,7 @@ const MyPage = () => {
                   
                   <div className="flex items-center space-x-3">
                     <div className="w-12 h-12 bg-orange-400 rounded-full flex items-center justify-center">
-                      <span className="text-white text-lg font-medium">👤</span>
+                      <span className="text-white text-lg font-medium">🦊</span>
                     </div>
                     <span className="text-gray-900 font-medium">{userInfo.nickname}</span>
                   </div>
@@ -339,7 +338,7 @@ const MyPage = () => {
               </div>
             )}
 
-            {activeTab === '찜한 전문가' && (
+            {activeTab === '찜한 전문가' && !isExpert && (
               <div className="bg-white rounded-lg p-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-6">찜한 전문가</h2>
                 
@@ -390,11 +389,25 @@ const MyPage = () => {
                 </div>
               </div>
             )}
+
+            {/* 전문가 전용 탭들 */}
+            {activeTab === '전문가 페이지 수정' && isExpert && (
+              <div className="bg-white rounded-lg p-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-6">전문가 페이지 수정</h2>
+                <p className="text-gray-600">전문가 페이지 수정 기능이 여기에 표시됩니다.</p>
+              </div>
+            )}
+
+            {activeTab === '상담 영업 스케줄 관리' && isExpert && (
+              <div className="bg-white rounded-lg p-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-6">상담 영업 스케줄 관리</h2>
+                <p className="text-gray-600">상담 영업 스케줄 관리 기능이 여기에 표시됩니다.</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      <Footer />
 
       {/* 비밀번호 변경 모달 */}
       {showPasswordModal && (

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import Footer from '../components/Footer';
 
 const SearchPage = () => {
   const [searchParams] = useSearchParams();
@@ -304,7 +303,6 @@ const SearchPage = () => {
           </div>
         )}
       </div>
-      <Footer />
     </div>
   );
 };

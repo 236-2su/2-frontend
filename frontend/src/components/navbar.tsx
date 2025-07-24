@@ -2,17 +2,16 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import stalkLogoBlue from '../assets/Stalk_logo_blue.svg';
 
-
-const Navbar = () => {
+const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [showCommunityMenu, setShowCommunityMenu] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [communityMenuTimeout, setCommunityMenuTimeout] = useState(null);
+  const [showProfileMenu, setShowProfileMenu] = useState<boolean>(false);
+  const [showCommunityMenu, setShowCommunityMenu] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [communityMenuTimeout, setCommunityMenuTimeout] = useState<NodeJS.Timeout | null>(null);
 
   // 검색 함수
-  const handleSearch = () => {
+  const handleSearch = (): void => {
     if (searchQuery.trim()) {
       // 검색어가 있을 때 검색 페이지로 이동
       navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
@@ -22,16 +21,15 @@ const Navbar = () => {
   };
 
   // 엔터키 이벤트 핸들러
-  const handleKeyPress = (e) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>): void => {
     if (e.key === 'Enter') {
       handleSearch();
     }
   };
 
   // 로그인 상태 확인 (실제로는 context나 state management 사용)
-  const isLoggedIn = location.pathname.includes('logged-in') || 
+  const isLoggedIn: boolean = location.pathname.includes('logged-in') || 
                     location.pathname === '/mypage' || 
-                    location.pathname === '/settings' ||
                     location.pathname === '/consultations' ||
                     location.pathname === '/favorites';
 
@@ -111,7 +109,7 @@ const Navbar = () => {
                   </button>
                   <button
                     onClick={() => {
-                      navigate('/community?tab=free');
+                      navigate('/community?tab=knowledge');
                       setShowCommunityMenu(false);
                     }}
                     className="w-full px-4 py-3 text-left text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors flex items-center space-x-3"
@@ -119,7 +117,7 @@ const Navbar = () => {
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
-                    <span>자유게시판</span>
+                    <span>투자 지식in</span>
                   </button>
                 </div>
               )}
@@ -157,20 +155,19 @@ const Navbar = () => {
               <div className="relative">
                 <button
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
-                  className="flex items-center space-x-2 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-full px-4 py-2 hover:bg-white hover:shadow-modern transition-all duration-300"
+                  className="flex items-center space-x-2 bg-white/80 backdrop-blur-sm  duration-300"
                 >
                   <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center text-white text-sm font-semibold">
                     김
                   </div>
-                  <span className="text-gray-700 font-medium text-sm">김사용자</span>
-                  <svg className={`w-4 h-4 text-gray-500 transition-transform duration-300 ${showProfileMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+                  
+                  
                 </button>
 
                 {/* Profile Dropdown Menu */}
                 {showProfileMenu && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white/90 backdrop-blur-xl rounded-2xl shadow-glow border border-white/20 py-2 z-50">
+                  <div className="absolute right-0 mt-2 w-48 bg-white/90 backdrop-blur-xl rounded-2xl border border-white/20 py-2 z-50">
+                    
                     <button
                       onClick={() => {
                         navigate('/mypage');
@@ -179,46 +176,10 @@ const Navbar = () => {
                       className="w-full px-4 py-3 text-left text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors flex items-center space-x-3"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                      <span>마이페이지</span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        navigate('/consultations');
-                        setShowProfileMenu(false);
-                      }}
-                      className="w-full px-4 py-3 text-left text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors flex items-center space-x-3"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                      </svg>
-                      <span>상담 내역</span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        navigate('/favorites');
-                        setShowProfileMenu(false);
-                      }}
-                      className="w-full px-4 py-3 text-left text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors flex items-center space-x-3"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                      </svg>
-                      <span>찜한 전문가</span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        navigate('/settings');
-                        setShowProfileMenu(false);
-                      }}
-                      className="w-full px-4 py-3 text-left text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors flex items-center space-x-3"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
-                      <span>설정</span>
+                      <span>마이 페이지</span>
                     </button>
                     <div className="border-t border-gray-200 my-1"></div>
                     <button

@@ -1,5 +1,5 @@
 import React from 'react';
-import ExpertCard from './ExpertCard';
+import ExpertCard from './exper-card';
 
 const MonthlyExperts = () => {
   const experts = [

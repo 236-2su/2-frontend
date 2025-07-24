@@ -51,6 +51,10 @@ const ExpertsPage = () => {
     return matchesCategory && matchesSearch;
   });
 
+  const handleExpertClick = (expertId: number) => {
+    navigate(`/expert-detail/${expertId}`);
+  };
+
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -74,6 +78,8 @@ const ExpertsPage = () => {
               <input
                 type="text"
                 placeholder="원하는 투자 전문가를 검색해보세요"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               <svg className="absolute right-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -108,15 +114,6 @@ const ExpertsPage = () => {
               <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors">
                 기술적 분석
               </button>
-              <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors">
-                
-              </button>
-              <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors">
-                
-              </button>
-              <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors">
-                
-              </button>
             </div>
           </div>
           <div className="flex space-x-4">
@@ -128,7 +125,11 @@ const ExpertsPage = () => {
         {/* Expert Profiles */}
         <div className="space-y-6">
           {filteredExperts.map((expert) => (
-            <div key={expert.id} className="bg-white rounded-lg p-6">
+            <div 
+              key={expert.id} 
+              className="bg-white rounded-lg p-6 border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all duration-300 cursor-pointer"
+              onClick={() => handleExpertClick(expert.id)}
+            >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   {/* Tags */}
@@ -147,6 +148,19 @@ const ExpertsPage = () => {
                   <div className="mb-3 flex flex-row gap-2">
                     <h3 className="text-left text-xl font-extrabold text-gray-900">{expert.name} </h3>
                     <p className="text-left text-gray-600">{expert.title}</p>
+                  </div>
+
+                  {/* Rating and Reviews */}
+                  <div className="flex items-center mb-3">
+                    <div className="flex text-yellow-400">
+                      {[...Array(5)].map((_, i) => (
+                        <span key={i} className={i < Math.floor(parseFloat(expert.rating)) ? 'text-yellow-400' : 'text-gray-300'}>
+                          ⭐
+                        </span>
+                      ))}
+                    </div>
+                    <span className="ml-2 font-semibold text-gray-900">{expert.rating}</span>
+                    <span className="ml-2 text-gray-600">리뷰 {expert.reviews}개</span>
                   </div>
 
                   {/* Description */}
@@ -170,8 +184,7 @@ const ExpertsPage = () => {
                     })}
                   </div>
 
-
-                
+                  
                 </div>
 
                 {/* Profile Image */}
@@ -186,8 +199,25 @@ const ExpertsPage = () => {
             </div>
           ))}
         </div>
-      </div>
 
+        {/* No Results */}
+        {filteredExperts.length === 0 && (
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">🔍</div>
+            <h3 className="text-2xl font-semibold text-gray-900 mb-2">검색 결과가 없습니다</h3>
+            <p className="text-gray-600 mb-4">다른 검색어나 카테고리를 시도해보세요</p>
+            <button
+              onClick={() => {
+                setSearchTerm('');
+                setSelectedCategory('all');
+              }}
+              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
+            >
+              전체 보기
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

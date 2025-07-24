@@ -1,7 +1,20 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const ExpertCard = ({ expert, isActive = false }) => {
+interface Expert {
+  id: string;
+  name: string;
+  title: string;
+  rating?: number;
+  tags: string[];
+}
+
+interface ExpertCardProps {
+  expert: Expert;
+  isActive?: boolean;
+}
+
+const ExpertCard: React.FC<ExpertCardProps> = ({ expert, isActive = false }) => {
   const navigate = useNavigate();
 
   return (
@@ -61,7 +74,7 @@ const ExpertCard = ({ expert, isActive = false }) => {
 
           {/* Action Button */}
           <button
-            onClick={() => navigate(`/expert/${expert.id}`)}
+            onClick={() => navigate(`/expert-detail/${expert.id}`)}
             className="w-full group/btn bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-2xl transition-all duration-300 shadow-soft hover:shadow-glow transform hover:scale-105"
           >
             <span className="flex items-center justify-center space-x-2">

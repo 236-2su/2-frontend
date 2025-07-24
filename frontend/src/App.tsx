@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router,Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import './App.css';
 
 // Components
@@ -9,7 +9,7 @@ import Footer from './components/footer';
 
 // Pages
 import HomePage from './pages/home-page';
-import HomeLoggedInPage from './pages/home-logged-in-page';
+
 import LoginPage from './pages/login-page';
 import SignupPage from './pages/signup-page';
 import SignupComplete from './pages/signup-complete';
@@ -20,7 +20,8 @@ import CommunityPage from './pages/community-page';
 import MyPage from './pages/my-page';
 import SettingsPage from './pages/settings-page';
 import WritePostPage from './pages/write-post-page';
-import ConsultationsPage from './pages/consultations-page';
+
+import ExpertDetailPage from './pages/expert-detail-page';
 import FavoritesPage from './pages/favorites-page';
 import SignupChoicePage from './pages/signup-choice-page';
 import SearchPage from './pages/search-page';
@@ -28,11 +29,12 @@ import SearchPage from './pages/search-page';
 // Navbar를 숨길 페이지 목록
 const hideNavbarRoutes: string[] = ['/login', '/signup', '/SignupChoicePage', '/signup-complete'];
 
+
 // Sidebar를 보여줄 페이지 목록 (모든 페이지에 적용)
 const showSidebarRoutes: string[] = [
   '/', 
-  '/home-logged-in', 
   '/experts', 
+ 
   '/community', 
   '/products', 
   '/mypage', 
@@ -44,7 +46,8 @@ const showSidebarRoutes: string[] = [
   '/notifications',
   '/watchlist',
   '/holdings',
-  '/reservations'
+  '/reservations',
+  '/expert-detail'
 ];
 
 // Footer를 숨길 페이지 목록
@@ -53,8 +56,13 @@ const hideFooterRoutes: string[] = ['/login', '/signup', '/SignupChoicePage', '/
 const AppContent: React.FC = () => {
   const location = useLocation();
   const showNavbar: boolean = !hideNavbarRoutes.includes(location.pathname);
-  const showSidebar: boolean = showSidebarRoutes.includes(location.pathname);
+  const showSidebar: boolean = showSidebarRoutes.includes(location.pathname) || location.pathname.startsWith('/expert-detail/');
   const showFooter: boolean = !hideFooterRoutes.includes(location.pathname);
+
+  // Scroll to top on route change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
   
   console.log('Current path:', location.pathname);
   console.log('Show footer:', showFooter);
@@ -77,14 +85,15 @@ const AppContent: React.FC = () => {
               <Route path="/search" element={<SearchPage />} />
               
               {/* Protected Routes */}
-              <Route path="/home-logged-in" element={<HomeLoggedInPage />} />
+              <Route path="/home-logged-in" element={<HomePage />} />
               <Route path="/experts" element={<ExpertsPage />} />
               <Route path="/community" element={<CommunityPage />} />
               <Route path="/products" element={<ProductsPage />} />
               <Route path="/mypage" element={<MyPage />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/write-post" element={<WritePostPage />} />
-              <Route path="/consultations" element={<ConsultationsPage />} />
+              <Route path="/consultations" element={<div className="p-4"><h1>상담 내역</h1></div>} />
+              <Route path="/expert-detail/:id" element={<ExpertDetailPage />} />
               <Route path="/favorites" element={<FavoritesPage />} />
               
               {/* Sidebar Routes */}

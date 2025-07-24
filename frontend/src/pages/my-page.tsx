@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NewNavbar from '../components/new-navbar';
-import stalkLogoBlue from '../assets/Stalk_logo_blue.svg';
+
 
 const MyPage = () => {
   const navigate = useNavigate();
@@ -46,7 +46,10 @@ const MyPage = () => {
     selectedAvatar: 'default'
   });
   
-  const [imageUploadForm, setImageUploadForm] = useState({
+  const [imageUploadForm, setImageUploadForm] = useState<{
+    fileName: string;
+    selectedFile: File | null;
+  }>({
     fileName: '',
     selectedFile: null
   });
@@ -114,24 +117,24 @@ const MyPage = () => {
   ];
 
   // Form handlers
-  const handlePasswordChange = (e) => {
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPasswordForm({ ...passwordForm, [e.target.name]: e.target.value });
   };
 
-  const handleEditInfoChange = (e) => {
+  const handleEditInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEditInfoForm({ ...editInfoForm, [e.target.name]: e.target.value });
   };
 
-  const handleProfileChange = (e) => {
+  const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setProfileForm({ ...profileForm, [e.target.name]: e.target.value });
   };
 
-  const handleFileSelect = (e) => {
-    const file = e.target.files[0];
-    if (file) {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files[0]) {
       setImageUploadForm({
-        fileName: file.name,
-        selectedFile: file
+        fileName: files[0].name,
+        selectedFile: files[0]
       });
     }
   };
@@ -145,7 +148,10 @@ const MyPage = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <NewNavbar userType={isExpert ? 'expert' : 'general'} />
+      <NewNavbar 
+        userType={isExpert ? 'expert' : 'general'} 
+        onUserTypeChange={() => {}} 
+      />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-8">
@@ -314,7 +320,7 @@ const MyPage = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {consultationData[consultationTab].map((item, index) => (
+                      {consultationData[consultationTab as keyof typeof consultationData].map((item, index) => (
                         <tr key={index} className="border-b border-gray-100">
                           <td className="px-4 py-3 text-left text-sm text-gray-900">{item.date}</td>
                           <td className="px-4 py-3 text-left text-sm text-gray-900">{item.time}</td>

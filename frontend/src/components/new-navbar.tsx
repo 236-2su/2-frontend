@@ -2,7 +2,13 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import stalkLogoBlue from '../assets/stalk_logo_blue.svg';
 
-const NewNavbar = ({ userType, onUserTypeChange, showUserTypeToggle = false }) => {
+interface NewNavbarProps {
+  userType?: string;
+  onUserTypeChange?: (type: string) => void;
+  showUserTypeToggle?: boolean;
+}
+
+const NewNavbar: React.FC<NewNavbarProps> = ({ userType = 'general', onUserTypeChange = () => {}, showUserTypeToggle = false }) => {
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
 

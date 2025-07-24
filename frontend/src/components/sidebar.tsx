@@ -11,7 +11,7 @@ interface MenuItem {
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
 
   const menuItems: MenuItem[] = [
     {
@@ -88,23 +88,7 @@ const Sidebar: React.FC = () => {
         </ul>
       </nav>
 
-      {/* Recent Section */}
-      {!isCollapsed && (
-        <div className="px-3 py-4 border-t border-gray-100">
-          <h3 className="text-sm font-semibold text-gray-900 mb-2">최근 본</h3>
-          <div className="space-y-1.5">
-            <div className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 cursor-pointer">
-              <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center">
-                <span className="text-blue-600 text-xs font-bold">현</span>
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900">현대차</p>
-                <p className="text-xs text-gray-500">219,000원</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      
 
       {/* Bottom Icons */}
       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 space-y-2">

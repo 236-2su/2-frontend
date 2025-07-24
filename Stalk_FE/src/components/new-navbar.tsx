@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import stalkLogoBlue from '../assets/stalk_logo_blue.svg';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import stalkLogoBlue from '@/assets/Stalk_logo_blue.svg';
 
 interface NewNavbarProps {
   userType?: string;
@@ -10,7 +10,6 @@ interface NewNavbarProps {
 
 const NewNavbar: React.FC<NewNavbarProps> = ({ userType = 'general', onUserTypeChange = () => {}, showUserTypeToggle = false }) => {
   const navigate = useNavigate();
-  const [isHovered, setIsHovered] = useState(false);
 
   return (
     <nav className="w-full h-20 flex items-center justify-between relative px-5 mb-10">

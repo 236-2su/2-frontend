@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import NewNavbar from '../components/new-navbar';
-import certificationExample from '../assets/certification_example.svg';
-import stalkLogoBlue from '../assets/stalk_logo_blue.svg';
+import NewNavbar from '@/components/new-navbar';
+import certificationExample from '@/assets/certification_example.svg';
+import stalkLogoBlue from '@/assets/Stalk_logo_blue.svg';
 
 const SignupPage = () => {
   const navigate = useNavigate();

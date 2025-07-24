@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import Toss_symbol from '../assets/Toss_Symbol_Primary.svg';
+import Toss_symbol from '@/assets/Toss_Symbol_Primary.svg';
 
 interface MenuItem {
   id: string;

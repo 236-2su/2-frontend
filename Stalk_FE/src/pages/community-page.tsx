@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import Footer from '../components/footer';
+import Footer from '@/components/footer';
 
 const CommunityPage = () => {
   const navigate = useNavigate();

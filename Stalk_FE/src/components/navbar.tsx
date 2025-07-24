@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import stalkLogoBlue from '../assets/Stalk_logo_blue.svg';
+import stalkLogoBlue from '@/assets/Stalk_logo_blue.svg';
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
@@ -8,7 +8,7 @@ const Navbar: React.FC = () => {
   const [showProfileMenu, setShowProfileMenu] = useState<boolean>(false);
   const [showCommunityMenu, setShowCommunityMenu] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [communityMenuTimeout, setCommunityMenuTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [communityMenuTimeout, setCommunityMenuTimeout] = useState<number | null>(null);
 
   // 검색 함수
   const handleSearch = (): void => {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import NewNavbar from '../components/new-navbar';
+import NewNavbar from '@/components/new-navbar';
 
 interface Review {
   id: number;

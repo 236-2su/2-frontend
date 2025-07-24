@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import stalkLogoBlue from '../assets/Stalk_logo_blue.svg';
+import stalkLogoBlue from '@/assets/Stalk_logo_blue.svg';
 
 const ExpertsPage = () => {
   const navigate = useNavigate();

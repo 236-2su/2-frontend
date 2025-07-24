@@ -1,30 +1,30 @@
 import React from 'react';
 import { BrowserRouter as Router,Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import './App.css';
+import '@/App.css';
 
 // Components
-import Navbar from './components/navbar';
-import Sidebar from './components/sidebar';
-import Footer from './components/footer';
+import Navbar from '@/components/navbar';
+import Sidebar from '@/components/sidebar';
+import Footer from '@/components/footer';
 
 // Pages
-import HomePage from './pages/home-page';
+import HomePage from '@/pages/home-page';
 
-import LoginPage from './pages/login-page';
-import SignupPage from './pages/signup-page';
-import SignupComplete from './pages/signup-complete';
+import LoginPage from '@/pages/login-page';
+import SignupPage from '@/pages/signup-page';
+import SignupComplete from '@/pages/signup-complete';
 
-import ExpertsPage from './pages/experts-page';
-import ProductsPage from './pages/products-page';
-import CommunityPage from './pages/community-page';
-import MyPage from './pages/my-page';
+import ExpertsPage from '@/pages/experts-page';
+import ProductsPage from '@/pages/products-page';
+import CommunityPage from '@/pages/community-page';
+import MyPage from '@/pages/my-page';
 
-import WritePostPage from './pages/write-post-page';
+import WritePostPage from '@/pages/write-post-page';
 
-import ExpertDetailPage from './pages/expert-detail-page';
-import FavoritesPage from './pages/favorites-page';
-import SignupChoicePage from './pages/signup-choice-page';
-import SearchPage from './pages/search-page';
+import ExpertDetailPage from '@/pages/expert-detail-page';
+import FavoritesPage from '@/pages/favorites-page';
+import SignupChoicePage from '@/pages/signup-choice-page';
+import SearchPage from '@/pages/search-page';
 
 // Navbar를 숨길 페이지 목록
 const hideNavbarRoutes: string[] = ['/login', '/signup', '/SignupChoicePage', '/signup-complete'];

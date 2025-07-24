@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import NewNavbar from '../components/new-navbar';
-import stalkLogoBlue from '../assets/stalk_logo_blue.svg';
+import NewNavbar from '@/components/new-navbar';
+
 
 const SignupComplete = () => {
   const navigate = useNavigate();

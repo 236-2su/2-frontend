@@ -1,20 +1,13 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import stalkLogoBlue from '@/assets/Stalk_logo_blue.svg';
+import stalkLogoBlue from '@/assets/images/logos/Stalk_logo_blue.svg';
 
 const ExpertsPage = () => {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
 
-  const categories = [
-    { id: 'all', name: '전체', icon: '👥' },
-    { id: 'stock', name: '주식', icon: '📈' },
-    { id: 'fund', name: '펀드', icon: '💰' },
-    { id: 'crypto', name: '암호화폐', icon: '₿' },
-    { id: 'realestate', name: '부동산', icon: '🏠' },
-    { id: 'insurance', name: '보험', icon: '🛡️' }
-  ];
+
 
   const experts = [
     {

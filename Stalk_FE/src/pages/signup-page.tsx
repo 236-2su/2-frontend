@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import NewNavbar from '@/components/new-navbar';
-import certificationExample from '@/assets/certification_example.svg';
-import stalkLogoBlue from '@/assets/Stalk_logo_blue.svg';
+import certificationExample from '@/assets/images/dummy/certification_example.svg';
+import stalkLogoBlue from '@/assets/images/logos/Stalk_logo_blue.svg';
 
 const SignupPage = () => {
   const navigate = useNavigate();
@@ -14,6 +14,14 @@ const SignupPage = () => {
   const [passwordsMatch, setPasswordsMatch] = useState(true);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [showThirdPartyModal, setShowThirdPartyModal] = useState(false);
+  // 자격증 정보를 위한 인터페이스
+  interface QualificationData {
+    qualification: string;
+    certificateNumber: string;
+    birthDate: string;
+    verificationNumber: string;
+  }
+
   const [formData, setFormData] = useState({
     userId: '',
     name: '',
@@ -25,11 +33,15 @@ const SignupPage = () => {
     emailDomain: '',
     verificationCode: '',
     userType: 'general',
-    profilePhoto: null,
-    qualification: '',
-    certificateNumber: '',
-    birthDate: '',
-    verificationNumber: '',
+    profilePhoto: null as File | null,
+    qualifications: [
+      {
+        qualification: '',
+        certificateNumber: '',
+        birthDate: '',
+        verificationNumber: ''
+      }
+    ] as QualificationData[],
     termsAgreement: false,
     privacyAgreement: false,
     thirdPartyAgreement: false
@@ -46,7 +58,7 @@ const SignupPage = () => {
 
   // 타이머 효과
   useEffect(() => {
-    let interval = null;
+    let interval: ReturnType<typeof setInterval> | null = null;
     if (isTimerActive && timeLeft > 0) {
       interval = setInterval(() => {
         setTimeLeft(timeLeft - 1);
@@ -54,27 +66,29 @@ const SignupPage = () => {
     } else if (timeLeft === 0) {
       setIsTimerActive(false);
     }
-    return () => clearInterval(interval);
+    return () => {
+      if (interval) clearInterval(interval);
+    };
   }, [isTimerActive, timeLeft]);
 
-  const formatTime = (seconds) => {
+  const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}분 ${secs.toString().padStart(2, '0')}초`;
   };
 
-  const handleUserTypeChange = (type) => {
+  const handleUserTypeChange = (type: string) => {
     setUserType(type);
     setFormData(prev => ({ ...prev, userType: type }));
     navigate(`/signup?type=${type}`);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     navigate('/signup-complete');
   };
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -94,13 +108,77 @@ const SignupPage = () => {
     }
   };
 
+
+
+  const handleQualificationChange = (e: React.ChangeEvent<HTMLInputElement>, index: number, field: keyof QualificationData) => {
+    const { value } = e.target;
+    const newQualifications = [...formData.qualifications];
+    newQualifications[index][field] = value;
+    
+    // 마지막 폼에서 입력이 시작되면 새로운 빈 폼 추가
+    if (index === formData.qualifications.length - 1 && value.trim() !== '') {
+      newQualifications.push({
+        qualification: '',
+        certificateNumber: '',
+        birthDate: '',
+        verificationNumber: ''
+      });
+    }
+    
+    setFormData({
+      ...formData,
+      qualifications: newQualifications
+    });
+  };
+
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    
+    // 자격증 관련 필드인지 확인
+    if (name.startsWith('qualification_')) {
+      const index = parseInt(name.split('_')[1]);
+      const newQualifications = [...formData.qualifications];
+      newQualifications[index].qualification = value;
+      
+      // 마지막 폼에서 선택이 시작되면 새로운 빈 폼 추가
+      if (index === formData.qualifications.length - 1 && value !== '') {
+        newQualifications.push({
+          qualification: '',
+          certificateNumber: '',
+          birthDate: '',
+          verificationNumber: ''
+        });
+      }
+      
+      setFormData({
+        ...formData,
+        qualifications: newQualifications
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value
+      });
+    }
+  };
+
+  const removeQualification = (index: number) => {
+    if (formData.qualifications.length > 1) {
+      const newQualifications = formData.qualifications.filter((_, i) => i !== index);
+      setFormData({
+        ...formData,
+        qualifications: newQualifications
+      });
+    }
+  };
+
   const handleSendVerification = () => {
     setIsTimerActive(true);
     setTimeLeft(300);
     setIsEmailSent(true);
   };
 
-  const handleAllTermsAgreement = (checked) => {
+  const handleAllTermsAgreement = (checked: boolean) => {
     setFormData({
       ...formData,
       privacyAgreement: checked,
@@ -110,7 +188,7 @@ const SignupPage = () => {
   };
 
   // 개별 약관 체크 시 전체 동의 자동 체크
-  const handleIndividualAgreement = (name, checked) => {
+  const handleIndividualAgreement = (name: string, checked: boolean) => {
     const newFormData = {
       ...formData,
       [name]: checked
@@ -176,7 +254,7 @@ const SignupPage = () => {
                         <input
                           type="file"
                           accept="image/*"
-                          onChange={(e) => setFormData({...formData, profilePhoto: e.target.files[0]})}
+                          onChange={(e) => setFormData({...formData, profilePhoto: e.target.files?.[0] || null})}
                           className="hidden"
                           id="profilePhoto"
                         />
@@ -295,38 +373,44 @@ const SignupPage = () => {
                 {/* Confirm Password */}
                 <div className='flex flex-row items-center mb-2 gap-3'>
                   <h3 className="w-1/6 text-sm font-medium text-gray-700 mb-2 text-left">
-                    비밀번호 확인
+                    비밀번호 <br /> 확인
                   </h3>
-                  <input
-                    type="password"
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all duration-300 ${
-                      !passwordsMatch && formData.confirmPassword 
-                        ? 'border-red-500 focus:border-red-500' 
-                        : 'border-gray-300 focus:border-blue-500'
-                    }`}
-                    placeholder="비밀번호를 한 번 더 입력해주세요"
-                    required
-                  />
-                  {formData.password && formData.confirmPassword && passwordsMatch && (
-                    <div className="flex items-center space-x-2 mt-2 text-green-600 justify-start">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span className="text-sm">입력한 비밀번호와 일치합니다.</span>
-                    </div>
-                  )}
-                  {!passwordsMatch && formData.confirmPassword && (
-                    <div className="flex items-center space-x-2 mt-2 text-red-600 justify-start">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                      <span className="text-sm">비밀번호가 일치하지 않습니다.</span>
-                    </div>
-                  )}
+                  <div className="relative w-full">
+                    <input
+                      type="password"
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all duration-300 ${
+                        !passwordsMatch && formData.confirmPassword 
+                          ? 'border-red-500 focus:border-red-500' 
+                          : 'border-gray-300 focus:border-blue-500'
+                      }`}
+                      placeholder="비밀번호를 한 번 더 입력해주세요"
+                      required
+                    />
+                    {/* 비밀번호 확인 메시지 - 절대 위치로 배치 */}
+                    {formData.password && formData.confirmPassword && (
+                      <div className="left-0 top-full mt-6 z-10">
+                        {passwordsMatch ? (
+                          <div className="flex items-center space-x-2 text-green-600">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span className="text-sm">입력한 비밀번호와 일치합니다.</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center space-x-2 text-red-600">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            <span className="text-sm">비밀번호가 일치하지 않습니다.</span>
+                          </div>
+                                                )}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 
@@ -352,8 +436,8 @@ const SignupPage = () => {
                     />
                   </div>
                 {/* Email */}
-                <div className='flex flex-row items-center mb-2'>
-                  <h3 className="w-1/6 text-sm font-medium text-gray-700 mb-2 text-left">
+                <div className='flex flex-row items-start mb-2'>
+                  <h3 className="mt-3 w-1/6 text-sm font-medium text-gray-700 mb-2 text-left">
                     이메일
                   </h3>
                   
@@ -378,7 +462,7 @@ const SignupPage = () => {
                         <select
                         name="emailDomain"
                         value={formData.emailDomain}
-                        onChange={handleChange}
+                        onChange={handleSelectChange}
                         className={`flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all duration-300 ${
                           formData.emailDomain === '' ? 'text-gray-400' : 'text-black'
                         }`}
@@ -407,8 +491,8 @@ const SignupPage = () => {
                 </div>
 
                 {/* Email Verification */}
-                <div className='flex flex-row items-center mb-2'>
-                  <div className="w-1/6 text-sm text-gray-600 mb-2 text-left">
+                <div className='flex flex-row items-start mb-2'>
+                  <div className="mt-3 w-1/6 text-sm text-gray-600 mb-2 text-left">
                     {isTimerActive ? `${formatTime(timeLeft)} 안에 인증을 완료하세요` : '인증하기'}
                   </div>
                   <div className="flex flex-col ">
@@ -420,7 +504,7 @@ const SignupPage = () => {
                       onChange={handleChange}
                       className="px-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all duration-300"
                       placeholder="6자리 인증번호"
-                      maxLength="6"
+                      maxLength={6}
                     />
                     <button
                       type="button"
@@ -438,6 +522,8 @@ const SignupPage = () => {
                     </div>
                   )}
                 </div>
+
+
 
                 
               </div>
@@ -464,69 +550,81 @@ const SignupPage = () => {
                 </div>
 
                 {/* Form 제목 라벨 */}
-                <div className="grid grid-cols-4 gap-4 mb-1 w-full">
+                <div className="grid grid-cols-5 gap-4 mb-1 w-full">
                   <h4 className="text-sm font-medium text-gray-700 text-left">전문 자격명</h4>
                   <h4 className="text-sm font-medium text-gray-700 text-left col-span-3">합격증 원본대조 번호</h4>
+                  <h4 className="text-sm font-medium text-gray-700 text-left">삭제</h4>
                 </div>
 
-                {/* Form 입력 부분 */}
-                <div className="grid grid-cols-4 gap-4 w-full">
-                  {/* Select */}
-                  <div>
-                    <select
-                      name="qualification"
-                      value={formData.qualification}
-                      onChange={handleChange}
-                      className="text-sm text-gray-500 w-full h-3/4 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-                    >
-                      <option value="">전문 자격을 선택하세요</option>
-                      <option value="financial_advisor">금융투자상담사</option>
-                      <option value="securities_analyst">증권분석사</option>
-                      <option value="cfa">CFA</option>
-                      <option value="cpa">CPA</option>
-                    </select>
-                    
-                  </div>
+                {/* 자격증 폼들 */}
+                {formData.qualifications.map((qualification, index) => (
+                  <div key={index} className="grid grid-cols-5 gap-4 w-full mb-4">
+                    {/* Select */}
+                    <div>
+                      <select
+                        name={`qualification_${index}`}
+                        value={qualification.qualification}
+                        onChange={handleSelectChange}
+                        className="text-sm text-gray-500 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+                      >
+                        <option value="">전문 자격을 선택하세요</option>
+                        <option value="financial_advisor">금융투자상담사</option>
+                        <option value="securities_analyst">증권분석사</option>
+                        <option value="cfa">CFA</option>
+                        <option value="cpa">CPA</option>
+                      </select>
+                    </div>
 
-                  {/* Input 1 */}
-                  <div className="flex flex-col">
-                    <input
-                      type="text"
-                      name="certificateNumber"
-                      value={formData.certificateNumber}
-                      onChange={handleChange}
-                      placeholder="없이 숫자만 입력"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">중앙에 위치한 합격증 번호</p>
-                  </div>
+                    {/* Input 1 */}
+                    <div className="flex flex-col">
+                      <input
+                        type="text"
+                        value={qualification.certificateNumber}
+                        onChange={(e) => handleQualificationChange(e, index, 'certificateNumber')}
+                        placeholder="없이 숫자만 입력"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">중앙에 위치한 합격증 번호</p>
+                    </div>
 
-                  {/* Input 2 */}
-                  <div className="flex flex-col">
-                    <input
-                      type="text"
-                      name="birthDate"
-                      value={formData.birthDate}
-                      onChange={handleChange}
-                      placeholder="없이 숫자만 입력"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">합격증에 표기된 생년월일</p>
-                  </div>
+                    {/* Input 2 */}
+                    <div className="flex flex-col">
+                      <input
+                        type="text"
+                        value={qualification.birthDate}
+                        onChange={(e) => handleQualificationChange(e, index, 'birthDate')}
+                        placeholder="없이 숫자만 입력"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">합격증에 표기된 생년월일</p>
+                    </div>
 
-                  {/* Input 3 */}
-                  <div className="flex flex-col">
-                    <input
-                      type="text"
-                      name="verificationNumber"
-                      value={formData.verificationNumber}
-                      onChange={handleChange}
-                      placeholder="없이 숫자만 입력"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">하단 발급번호의 마지막 6자리</p>
+                    {/* Input 3 */}
+                    <div className="flex flex-col">
+                      <input
+                        type="text"
+                        value={qualification.verificationNumber}
+                        onChange={(e) => handleQualificationChange(e, index, 'verificationNumber')}
+                        placeholder="없이 숫자만 입력"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">하단 발급번호의 마지막 6자리</p>
+                    </div>
+
+                    {/* 삭제 버튼 */}
+                    <div className="flex flex-col justify-start">
+                      {formData.qualifications.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeQualification(index)}
+                          className="bg-red-500 text-white px-2 py-2 rounded-lg text-sm font-medium hover:bg-red-600 transition-colors"
+                        >
+                          삭제
+                        </button>
+                      )}
+                    </div>
                   </div>
-                </div>
+                ))}
               </div>
             )}
 
@@ -706,7 +804,10 @@ const SignupPage = () => {
             {/* 모달 푸터 */}
             <div className="flex justify-end p-6 border-t border-gray-200">
               <button
-                onClick={() => setShowPrivacyModal(false)}
+                onClick={() => {
+                  handleIndividualAgreement('privacyAgreement', true);
+                  setShowPrivacyModal(false);
+                }}
                 className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 확인
@@ -769,7 +870,10 @@ const SignupPage = () => {
             {/* 모달 푸터 */}
             <div className="flex justify-end p-6 border-t border-gray-200">
               <button
-                onClick={() => setShowThirdPartyModal(false)}
+                onClick={() => {
+                  handleIndividualAgreement('thirdPartyAgreement', true);
+                  setShowThirdPartyModal(false);
+                }}
                 className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 확인

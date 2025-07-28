@@ -266,10 +266,10 @@ const ExpertDetailPage: React.FC = () => {
             {/* Expert Header */}
             <div className="flex items-start justify-between mb-8">
               <div className="flex-1">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                <h1 className="text-left text-3xl font-bold text-gray-900 mb-2">
                   {expert.name} {expert.title}
                 </h1>
-                <p className="text-lg text-gray-600 italic mb-4">
+                <p className="text-left text-lg text-gray-600 italic mb-4">
                   "{expert.tagline}"
                 </p>
                 <div className="flex items-center space-x-4">

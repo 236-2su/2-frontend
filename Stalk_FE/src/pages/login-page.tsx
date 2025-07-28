@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NewNavbar from '@/components/new-navbar';
-import googleIcon from '@/assets/google_icon.svg';
-import naverIcon from '@/assets/naver_icon.svg';
-import kakaoIcon from '@/assets/kakao_icon.svg';
+import googleIcon from '@/assets/images/icons/google_icon.svg';
+import naverIcon from '@/assets/images/icons/naver_icon.svg';
+import kakaoIcon from '@/assets/images/icons/kakao_icon.svg';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -14,7 +14,7 @@ const LoginPage = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    navigate('/home-logged-in');
+    navigate('/');
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,7 +48,7 @@ const LoginPage = () => {
                       ID
                     </label>
                     <input
-                      type="id"
+                      type="text"
                       id="id"
                       name="id"
                       value={formData.id}

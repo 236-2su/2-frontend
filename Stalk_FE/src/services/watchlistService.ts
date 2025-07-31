@@ -1,8 +1,10 @@
 import { WatchlistItem } from '@/types';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+
 class WatchlistService {
   // 사용자의 관심종목 목록 조회
-  static async getUserWatchlist(_userId: string): Promise<WatchlistItem[]> {
+  static async getUserWatchlist(_userId: number): Promise<WatchlistItem[]> {
     // TODO: 실제 API 호출로 대체
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -18,7 +20,7 @@ class WatchlistService {
   }
 
   // 관심종목 추가
-  static async addToWatchlist(_userId: string, item: WatchlistItem): Promise<{ success: boolean; message: string }> {
+  static async addToWatchlist(_userId: number, item: WatchlistItem): Promise<{ success: boolean; message: string }> {
     // TODO: 실제 API 호출로 대체
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -31,7 +33,7 @@ class WatchlistService {
   }
 
   // 관심종목 제거
-  static async removeFromWatchlist(_userId: string, _code: string): Promise<{ success: boolean; message: string }> {
+  static async removeFromWatchlist(_userId: number, _code: string): Promise<{ success: boolean; message: string }> {
     // TODO: 실제 API 호출로 대체
     return new Promise((resolve) => {
       setTimeout(() => {

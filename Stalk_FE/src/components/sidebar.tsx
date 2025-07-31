@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import tossLogoBlue from '@/assets/images/logos/Toss_logo_blue.svg';
 import checkIcon from '@/assets/images/icons/check_icon.svg';
+import sidebarSlideupIcon from '@/assets/images/icons/sidebar_slideup_icon.svg';
 import likeClickIcon from '@/assets/images/icons/like_click_icon.svg';
 import sidebarOpenCloseIcon from '@/assets/images/icons/sidebar_openclose_icon.svg';
 import { useWatchlist } from '@/context/WatchlistContext';
@@ -299,7 +300,7 @@ const Sidebar: React.FC = () => {
   return (
     <>
       {/* Collapsed Sidebar */}
-      <div className="sidebar-container fixed right-0 top-0 h-full bg-white shadow-lg border-l border-gray-200 w-16 z-50 flex flex-col">
+      <div className="sidebar-container fixed right-0 top-0 h-full bg-white border-l border-gray-200 w-20 z-50 flex flex-col">
         {/* Toggle Button */}
         <div className="py-4 flex justify-center">
           <button
@@ -339,22 +340,22 @@ const Sidebar: React.FC = () => {
         <div className="pb-4 flex flex-col items-center space-y-2">
           <button 
             onClick={() => window.open('https://www.tossinvest.com/', '_blank')}
-            className="w-12 h-12 bg-white rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors shadow-lg border border-gray-200"
+            className="w-12 h-12 bg-white rounded-full flex items-center justify-center hover:bg-blue-100 transition-colors border border-gray-200"
           >
             <img src={tossLogoBlue} alt="Toss" className="w-6 h-6" />
           </button>
           <button 
             onClick={scrollToTop}
-            className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-colors"
+            className="w-10 h-10 border border-gray-300 bg-white rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors"
           >
-            <span className="text-xs">↑</span>
+            <img src={sidebarSlideupIcon} alt="scroll to top" className="w-5 h-5" />
           </button>
         </div>
       </div>
 
       {/* Expanded Content Panel */}
       {!isCollapsed && (
-        <div className="sidebar-container fixed right-16 top-0 h-full bg-white shadow-xl border-l border-gray-200 w-80 z-40">
+        <div className="sidebar-container fixed right-20 top-0 h-full bg-white shadow-xl border-l border-gray-200 w-80 z-40">
           <div className="flex items-center justify-between p-4 border-b border-gray-100">            <h2 className="text-lg font-semibold text-gray-900">{getCurrentMenuLabel()}</h2>
             {selectedMenu === 'notifications' && (
               <button className="text-sm text-gray-500 hover:text-gray-700" onClick={() => setNotifications([])}>

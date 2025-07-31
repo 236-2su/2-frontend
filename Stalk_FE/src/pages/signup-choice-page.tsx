@@ -1,6 +1,7 @@
 
 import { Link } from 'react-router-dom';
 import NewNavbar from '@/components/new-navbar';
+import Footer from '@/components/footer';
 import normalUserIcon from '@/assets/images/icons/normal_user_icon.svg';
 import specialistIcon from '@/assets/images/icons/specialist_icon.svg';
 
@@ -9,7 +10,7 @@ const SignupChoicePage = () => {
   return (
     <div className="relative flex flex-col min-h-screen bg-gradient-to-b from-blue-100 to-white">
       <NewNavbar />
-      <main className="flex-grow flex flex-col items-center justify-center">
+      <main className="flex items-center justify-center px-4 pb-8">
         <div className="w-full max-w-4xl bg-white rounded-[40px] shadow-lg flex flex-col p-20">
           <div className="text-center mb-8">
             <h1 className="text-3xl md:text-4xl font-extrabold text-gray-800">회원가입</h1>
@@ -31,7 +32,7 @@ const SignupChoicePage = () => {
           </div>
         </div>
       </main>
-      
+      <Footer />
     </div>
   );
 };

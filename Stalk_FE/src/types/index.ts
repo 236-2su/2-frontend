@@ -1,14 +1,51 @@
 // 사용자 관련 타입
 export interface User {
-  userId: string;
-  name: string;
-  contact: string;
-  email: string;
-  nickname: string;
+  userId: string;  // 백엔드 UserProfileResponseDto 기준: String 타입
+  name: string;    // 백엔드: name
+  contact: string; // 백엔드: contact
+  email: string;   // 백엔드: email
+  profileImage?: string; // 백엔드: profileImage
+  role: string;    // 백엔드: role (USER/ADVISOR/ADMIN)
+  // 프론트엔드에서만 사용하는 필드들
+  nickname?: string;
   qualification?: string;
   isApproved?: boolean;
-  userType: 'general' | 'expert';
-  profilePhoto?: string;
+  userType?: 'general' | 'expert';
+}
+
+// 백엔드 API 응답 타입
+export interface LoginRequest {
+  userId: string;  // 로그인 요청은 문자열 (사용자 입력)
+  password: string;
+}
+
+export interface LoginResponse {
+  accessToken: string;
+  refreshToken: string;
+  userId: number;  // 백엔드 LoginResponseDto: Long 타입
+  userName: string;
+  role: 'USER' | 'ADVISOR' | 'ADMIN';
+  message: string;
+}
+
+export interface UserInfo {
+  userId: number;  // 백엔드 LoginResponseDto 기준: Long 타입
+  userName: string;
+  role: 'USER' | 'ADVISOR' | 'ADMIN';
+}
+
+export interface AuthState {
+  isLoggedIn: boolean;
+  isLoading: boolean;
+  userInfo: UserInfo | null;
+}
+
+export interface BaseApiResponse<T> {
+  httpStatus: string;
+  isSuccess: boolean;
+  message: string;
+  code: number;
+  result: T;
 }
 
 // 상담 관련 타입
@@ -58,21 +95,17 @@ export interface ProfileForm extends Record<string, unknown> {
 }
 
 export interface SignupFormData {
-  userId: string;
   name: string;
+  userId: string;
   nickname: string;
   password: string;
-  confirmPassword: string;
+  passwordConfirm: string;
   contact: string;
   email: string;
   emailDomain: string;
   verificationCode: string;
-  userType: 'general' | 'expert';
-  profilePhoto: File | null;
-  qualifications: QualificationData[];
-  termsAgreement: boolean;
-  privacyAgreement: boolean;
-  thirdPartyAgreement: boolean;
+  agreedTerms: boolean;
+  agreedPrivacy: boolean;
 }
 
 // 스케줄 관련 타입

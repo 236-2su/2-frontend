@@ -7,6 +7,17 @@ interface ConsultationRequest {
   content: string;
 }
 
+interface SessionTokenResponse {
+  sessionId: string;
+  token: string;
+  createdAt: string;
+}
+
+interface SessionInfo {
+  sessionId: string;
+  createdAt: string;
+}
+
 class ConsultationService {
   // 상담 예약
   static async bookConsultation(_data: ConsultationRequest): Promise<{ success: boolean; consultationId?: string; message: string }> {
@@ -23,7 +34,7 @@ class ConsultationService {
   }
 
   // 사용자의 상담 내역 조회
-  static async getUserConsultations(_userId: string): Promise<{
+  static async getUserConsultations(_userId: number): Promise<{
     scheduled: ConsultationItem[];
     completed: ConsultationItem[];
   }> {
@@ -112,8 +123,8 @@ class ConsultationService {
   }
 
   // 상담 일지 조회
-  static async getConsultationLog(_consultationId: string): Promise<{ 
-    content: string; 
+  static async getConsultationLog(_consultationId: string): Promise<{
+    content: string;
     recommendations: string[];
     attachments: string[];
   }> {
@@ -138,8 +149,8 @@ class ConsultationService {
 
   // 상담 일지 작성 (전문가용)
   static async createConsultationLog(
-    _consultationId: string, 
-    _content: string, 
+    _consultationId: string,
+    _content: string,
     _recommendations: string[]
   ): Promise<{ success: boolean; message: string }> {
     // TODO: 실제 API 호출로 대체
@@ -152,6 +163,49 @@ class ConsultationService {
       }, 1000);
     });
   }
+
+  // OpenVidu 세션 생성 및 토큰 발급
+  static async createSessionToken(consultationId: string): Promise<SessionTokenResponse> {
+    try {
+      const response = await fetch(`/api/consultations/${consultationId}/session`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Failed to create session token:', error);
+      throw new Error('세션 토큰 생성에 실패했습니다.');
+    }
+  }
+
+  // 세션 정보 조회
+  static async getSessionInfo(consultationId: string): Promise<SessionInfo> {
+    try {
+      const response = await fetch(`/api/consultations/${consultationId}/session`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Failed to get session info:', error);
+      throw new Error('세션 정보 조회에 실패했습니다.');
+    }
+  }
 }
 
-export default ConsultationService; 
+export default ConsultationService;
+export type { SessionTokenResponse, SessionInfo };

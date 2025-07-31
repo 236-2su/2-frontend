@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import Icon from '@/components/Icon';
 
 const HomePage: React.FC = () => {
   
@@ -30,8 +29,6 @@ const HomePage: React.FC = () => {
   return (
     
     <div className="relative overflow-hidden">
-      {/* 오른쪽 사이드바 */}
-      {/* <RightSidebar /> */}
       {/* Background Video */}
       <div className="relative w-full h-[100vh] overflow-hidden">
         <video 
@@ -57,17 +54,12 @@ const HomePage: React.FC = () => {
         <main className="px-4 sm:px-6 lg:px-8 py-8 pt-28">
           {/* 주목할만한 뉴스 */}
           <section className="max-w-7xl mx-auto mb-16">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-5 h-5 bg-primary-200 rounded-full"></div>
-              <h2 className="text-3xl font-bold text-secondary-900">주목할만한 뉴스</h2>
-            </div>
-            <div className="p-6 hover:shadow-lg transition-all duration-300 bg-white rounded-lg border">
-              <div className="flex items-center gap-8">
-                <span className="text-blue-500 text-xl font-bold">주식</span>
-                <p className="text-gray-700 text-xl font-light flex-1">
+            <div className="p-6 transition-all duration-300 bg-white rounded-lg border">
+              <div className="flex items-center gap-10">
+                <span className="text-blue-500 text-xl font-bold">Today's News</span>
+                <p className="text-gray-700 text-xl font-light">
                   미국-일본 무역 협정 체결로 아시아 자동차 제조사 주가 급등; 도요타 16% 상승
                 </p>
-                <Icon name="arrowRight" className="text-blue-500 text-xl" />
               </div>
             </div>
           </section>
@@ -78,19 +70,16 @@ const HomePage: React.FC = () => {
               <div className="w-5 h-5 bg-primary-200 rounded-full"></div>
               <h2 className="text-3xl font-bold text-secondary-900">내 예약 내역</h2>
             </div>
-            <div className="p-6 hover:shadow-lg transition-all duration-300 bg-white rounded-lg border">
+            <div className="p-6 transition-all duration-300 bg-blue-50 rounded-lg border border-blue-500 border-semibold">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-8">
-                  <div className="text-blue-500">
+                  <div className="text-blue-500 flex flex-row gap-3">
                     <div className="text-xl font-bold">2025. 08. 17(월)</div>
                     <div className="text-xl font-bold text-gray-900">14:00</div>
                   </div>
                   <div className="text-gray-700 text-xl font-light">
                     김범주 투자운용컨설턴트
                   </div>
-                </div>
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
-                  김
                 </div>
               </div>
             </div>

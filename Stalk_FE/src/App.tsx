@@ -4,6 +4,7 @@ import '@/App.css';
 
 // Context
 import { WatchlistProvider } from '@/context/WatchlistContext';
+import { AuthProvider, useAuth } from '@/context/AuthContext';
 
 // Components
 import Navbar from '@/components/navbar';
@@ -11,6 +12,8 @@ import HomePageNavbar from '@/components/homepage-navbar';
 import Sidebar from '@/components/sidebar';
 import Footer from '@/components/footer';
 import ScrollToTop from '@/components/ScrollToTop';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import AdminProtectedRoute from '@/components/AdminProtectedRoute';
 
 // Pages
 import HomePage from '@/pages/home-page';
@@ -32,6 +35,8 @@ import ExpertDetailPage from '@/pages/expert-detail-page';
 import FavoritesPage from '@/pages/favorites-page';
 import SignupChoicePage from '@/pages/signup-choice-page';
 import SearchPage from '@/pages/search-page';
+import ExpertsIntroductionRegistrationPage from '@/pages/experts-introduction-registration-page';
+import VideoConsultationPage from '@/pages/video-consultation-page';
 
 // Navbar를 숨길 페이지 목록
 const hideNavbarRoutes: string[] = ['/', '/login', '/signup', '/SignupChoicePage', '/signup-complete'];
@@ -54,21 +59,21 @@ const showSidebarRoutes: string[] = [
   '/watchlist',
   '/holdings',
   '/reservations',
-  '/expert-detail'
+  '/expert-detail',
+  '/expert-registration'
 ];
 
 // Footer를 숨길 페이지 목록
-const hideFooterRoutes: string[] = [];
+const hideFooterRoutes: string[] = ['/SignupChoicePage', '/login'];
 
 const AppContent: React.FC = () => {
   const location = useLocation();
+  const { isLoggedIn, isLoading, userInfo } = useAuth();
   const showNavbar: boolean = !hideNavbarRoutes.includes(location.pathname);
   const showSidebar: boolean = showSidebarRoutes.includes(location.pathname) || location.pathname.startsWith('/expert-detail/');
   const showFooter: boolean = !hideFooterRoutes.includes(location.pathname);
   
-  console.log('Current path:', location.pathname);
-  console.log('Show footer:', showFooter);
-  console.log('Hide footer routes:', hideFooterRoutes);
+
 
   return (
     <div className="App min-h-screen bg-white flex flex-col">
@@ -98,12 +103,18 @@ const AppContent: React.FC = () => {
               <Route path="/consultations" element={<div className="p-4"><h1>상담 내역</h1></div>} />
               <Route path="/expert-detail/:id" element={<ExpertDetailPage />} />
               <Route path="/favorites" element={<FavoritesPage />} />
+              <Route path="/expert-registration" element={<ExpertsIntroductionRegistrationPage />} />
               
               {/* Sidebar Routes */}
               <Route path="/notifications" element={<div className="p-4"><h1>알림</h1></div>} />
               <Route path="/watchlist" element={<div className="p-4"><h1>관심종목</h1></div>} />
               <Route path="/holdings" element={<div className="p-4"><h1>보유종목</h1></div>} />
               <Route path="/reservations" element={<div className="p-4"><h1>예약내역</h1></div>} />
+
+              {/* Video Consultation Route */}
+              <Route path="/video-consultation/:consultationId" element={<VideoConsultationPage />} />
+
+              {/* Protected Routes */}
               
               {/* Redirect to home if route not found */}
               <Route path="*" element={<Navigate to="/" replace />} />
@@ -121,9 +132,11 @@ const App: React.FC = () => {
   return (
     <Router>
       <ScrollToTop />
-      <WatchlistProvider>
-        <AppContent />
-      </WatchlistProvider>
+      <AuthProvider>
+        <WatchlistProvider>
+          <AppContent />
+        </WatchlistProvider>
+      </AuthProvider>
     </Router>
   );
 };

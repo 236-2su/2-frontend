@@ -1,7 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import NewNavbar from '@/components/new-navbar';
+import { useAuth } from '@/context/AuthContext';
+import profileDefault from '@/assets/images/profiles/Profile_default.svg';
+import profileCat from '@/assets/images/profiles/Profile_cat.svg';
+import profileCheek from '@/assets/images/profiles/Profile_cheek.svg';
+import profileFox from '@/assets/images/profiles/Profile_fox.svg';
+import profilePanda from '@/assets/images/profiles/Profile_panda.svg';
+import profilePuppy from '@/assets/images/profiles/Profile_puppy.svg';
+import profileRabbit from '@/assets/images/profiles/Profile_rabbit.svg';
+import ConsultationService from '@/services/consultationService';
+import UserService from '@/services/userService';
+import { User } from '@/types';
 
 interface ConsultationItem {
+  id: string;
   date: string;
   time: string;
   content: string;
@@ -12,8 +25,40 @@ interface ConsultationItem {
 
 
 const MyPage = () => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { userInfo: authUserInfo, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('내 정보');
   const [consultationTab, setConsultationTab] = useState('상담 전');
+  const [isLoading, setIsLoading] = useState(false);
+  const [userInfo, setUserInfo] = useState<User | null>(null);
+
+  // 사용자 정보 로드
+  useEffect(() => {
+    const loadUserInfo = async () => {
+      if (authUserInfo?.userId) {
+        setIsLoading(true);
+        try {
+          const userData = await UserService.getUserInfo();
+          setUserInfo(userData);
+        } catch (error) {
+          console.error('사용자 정보 로드 실패:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    loadUserInfo();
+  }, [authUserInfo]);
+
+  // URL 파라미터에서 탭 설정
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam && ['내 정보', '내 상담 내역', '찜한 전문가', '전문가 페이지 수정', '상담 영업 스케줄 관리'].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [searchParams]);
   
   // 스케줄 관리 상태들
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -24,7 +69,7 @@ const MyPage = () => {
   const [selectedConsultation, setSelectedConsultation] = useState<ConsultationItem | null>(null);
   
   // 전문가 여부 확인 (DB 연결 전 임시 변수)
-  const isExpert = true; // true: 전문가, false: 일반 사용자
+  const isExpert = userInfo?.userType === 'expert';
   
   // Modal states
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -32,16 +77,6 @@ const MyPage = () => {
   const [showProfileEditModal, setShowProfileEditModal] = useState(false);
   const [showWithdrawalModal, setShowWithdrawalModal] = useState(false);
   const [showImageUploadModal, setShowImageUploadModal] = useState(false);
-  
-  const userInfo = {
-    userId: 'ssafy_kim',
-    name: '김싸피',
-    contact: '010-0000-0000',
-    email: 'ssafy@samsung.com',
-    nickname: '김싸피',
-    qualification: '투자자산운용사',
-    isApproved: true
-  };
 
   // Form states
   const [passwordForm, setPasswordForm] = useState({
@@ -51,14 +86,14 @@ const MyPage = () => {
   });
   
   const [editInfoForm, setEditInfoForm] = useState({
-    name: userInfo.name,
-    contact: userInfo.contact,
-    email: userInfo.email
+    name: userInfo?.name || '',
+    contact: userInfo?.contact || '',
+    email: userInfo?.email || ''
   });
   
   const [profileForm, setProfileForm] = useState({
-    nickname: userInfo.nickname,
-    selectedAvatar: 'default'
+    nickname: userInfo?.nickname || '',
+    selectedAvatar: 'fox' as string // 타입 명시
   });
   
   const [imageUploadForm, setImageUploadForm] = useState<{
@@ -68,6 +103,21 @@ const MyPage = () => {
     fileName: '',
     selectedFile: null
   });
+
+  // userInfo가 변경될 때 form 상태 업데이트
+  useEffect(() => {
+    if (userInfo) {
+      setEditInfoForm({
+        name: userInfo.name,
+        contact: userInfo.contact,
+        email: userInfo.email
+      });
+      setProfileForm({
+        nickname: userInfo.nickname || userInfo.name, // nickname이 없으면 name 사용
+        selectedAvatar: 'fox'
+      });
+    }
+  }, [userInfo]);
 
   const generalTabs = [
     { id: '내 정보', label: '내 정보' },
@@ -84,9 +134,11 @@ const MyPage = () => {
 
   const tabs = isExpert ? expertTabs : generalTabs;
 
-  const consultationData = {
+  // 하드코딩된 상담 데이터 (API 연동 전 임시)
+  const tempConsultationData: { [key: string]: ConsultationItem[] } = {
     '상담 전': [
       {
+        id: '1',   
         date: '2025. 07. 18.',
         time: '17:00',
         content: '입문 투자 상담',
@@ -97,6 +149,7 @@ const MyPage = () => {
     ],
     '상담 완료': [
       {
+        id: '1',   
         date: '2025. 07. 19.',
         time: '20:00',
         content: '입문 투자 상담',
@@ -107,7 +160,7 @@ const MyPage = () => {
     ]
   };
 
-  const favoriteExperts = [
+  const tempFavoriteExperts = [
     {
       id: 1,
       name: '박주현',
@@ -119,16 +172,21 @@ const MyPage = () => {
   ];
 
   // 8개의 동일한 카드를 생성
-  const expertCards = Array(8).fill(null).map(() => favoriteExperts[0]);
+  const expertCards = Array(8).fill(null).map(() => tempFavoriteExperts[0]);
+
+  // 상담 데이터와 찜한 전문가 데이터 (API 연동 전 임시)
+  const consultationData = tempConsultationData;
+  const favoriteExperts: any[] = [];
 
   // Avatar options
   const avatarOptions = [
-    { id: 'default', icon: '👤', color: 'bg-blue-200' },
-    { id: 'fox', icon: '🦊', color: 'bg-orange-200' },
-    { id: 'chick', icon: '🐤', color: 'bg-yellow-200' },
-    { id: 'panda', icon: '🐼', color: 'bg-gray-200' },
-    { id: 'rabbit', icon: '🐰', color: 'bg-pink-200' },
-    { id: 'shiba', icon: '🐕', color: 'bg-amber-200' }
+    { id: 'default', image: profileDefault },
+    { id: 'cat', image: profileCat },
+    { id: 'cheek', image: profileCheek },
+    { id: 'fox', image: profileFox },
+    { id: 'panda', image: profilePanda },
+    { id: 'puppy', image: profilePuppy },
+    { id: 'rabbit', image: profileRabbit }
   ];
 
   // Form handlers
@@ -142,6 +200,101 @@ const MyPage = () => {
 
   const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setProfileForm({ ...profileForm, [e.target.name]: e.target.value });
+  };
+
+  // API 연동 핸들러들
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      alert('새 비밀번호가 일치하지 않습니다.');
+      return;
+    }
+
+    try {
+      const userId = parseInt(userInfo?.userId || '0'); // string을 number로 변환
+      const result = await UserService.changePassword(userId, passwordForm);
+      
+      if (result.success) {
+        alert(result.message);
+        setShowPasswordModal(false);
+        setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      } else {
+        alert(result.message);
+      }
+    } catch (error) {
+      console.error('비밀번호 변경 실패:', error);
+      alert('비밀번호 변경에 실패했습니다.');
+    }
+  };
+
+  const handleEditInfoSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      const userId = parseInt(userInfo?.userId || '0'); // string을 number로 변환
+      const result = await UserService.updateUserInfo(userId, editInfoForm);
+      
+      if (result.success) {
+        alert(result.message);
+        setShowEditInfoModal(false);
+        // 사용자 정보 다시 로드
+        const updatedUserInfo = await UserService.getUserInfo();
+        setUserInfo(updatedUserInfo);
+      } else {
+        alert(result.message);
+      }
+    } catch (error) {
+      console.error('사용자 정보 수정 실패:', error);
+      alert('사용자 정보 수정에 실패했습니다.');
+    }
+  };
+
+  const handleProfileSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      const userId = parseInt(userInfo?.userId || '0'); // string을 number로 변환
+      const result = await UserService.updateUserInfo(userId, {
+        name: profileForm.nickname,
+        contact: userInfo?.contact || '',
+        email: userInfo?.email || ''
+      });
+      
+      if (result.success) {
+        alert('프로필이 성공적으로 수정되었습니다.');
+        setShowProfileEditModal(false);
+        // 사용자 정보 다시 로드
+        const updatedUserInfo = await UserService.getUserInfo();
+        setUserInfo(updatedUserInfo);
+      } else {
+        alert(result.message);
+      }
+    } catch (error) {
+      console.error('프로필 수정 실패:', error);
+      alert('프로필 수정에 실패했습니다.');
+    }
+  };
+
+  const handleWithdrawalSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      const userId = parseInt(userInfo?.userId || '0'); // string을 number로 변환
+      const result = await UserService.deleteAccount(userId, passwordForm.currentPassword);
+      
+      if (result.success) {
+        alert(result.message);
+        // 로그아웃 처리
+        logout();
+        navigate('/');
+      } else {
+        alert(result.message);
+      }
+    } catch (error) {
+      console.error('회원 탈퇴 실패:', error);
+      alert('회원 탈퇴에 실패했습니다.');
+    }
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -159,6 +312,26 @@ const MyPage = () => {
       fileName: '',
       selectedFile: null
     });
+  };
+
+  // 선택된 프로필 이미지 가져오기
+  const getSelectedProfileImage = () => {
+    switch (profileForm.selectedAvatar) {
+      case 'cat':
+        return profileCat;
+      case 'cheek':
+        return profileCheek;
+      case 'fox':
+        return profileFox;
+      case 'panda':
+        return profilePanda;
+      case 'puppy':
+        return profilePuppy;
+      case 'rabbit':
+        return profileRabbit;
+      default:
+        return userInfo?.profileImage || profileDefault;
+    }
   };
 
   // 스케줄 관리 관련 함수들
@@ -228,14 +401,23 @@ const MyPage = () => {
   };
 
   // 상담일지 관련 함수들
-  const handleConsultationDiaryClick = (consultation: ConsultationItem) => {
-    setSelectedConsultation(consultation);
-    setActiveTab('상담일지');
-  };
-
   const handleCloseDiary = () => {
     setSelectedConsultation(null);
     setActiveTab('내 상담 내역');
+  };
+
+  // 상담 입장 처리
+  const handleEnterConsultation = async (consultationItem: ConsultationItem) => {
+    try {
+      const consultationId = consultationItem.id;
+
+      const sessionData = await ConsultationService.createSessionToken(consultationId);
+      
+      navigate(`/video-consultation/${sessionData.sessionId}?sessionId=${sessionData.sessionId}&token=${sessionData.token}&id=${consultationId}`);
+    } catch (error) {
+      console.error('Failed to start consultation:', error);
+      alert('상담 입장에 실패했습니다. 다시 시도해주세요.');
+    }
   };
 
   const renderScheduleCalendar = () => {
@@ -302,6 +484,14 @@ const MyPage = () => {
 
   return (
     <div className="min-h-screen bg-white">
+      {isLoading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-2 text-gray-600">데이터를 불러오는 중...</p>
+          </div>
+        </div>
+      )}
       <NewNavbar 
         userType={isExpert ? 'expert' : 'general'} 
         onUserTypeChange={() => {}} 
@@ -335,7 +525,7 @@ const MyPage = () => {
               <div className="space-y-8">
                 {/* 내 정보 Section */}
                 <div className="bg-white rounded-lg p-6">
-                  <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
                     <h2 className="text-xl font-semibold text-gray-900">내 정보</h2>
                     <div className="flex space-x-4">
                       <button 
@@ -354,28 +544,28 @@ const MyPage = () => {
                   </div>
                   
                   <div className="space-y-4">
-                    <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                    <div className="flex justify-between items-center py-1">
                       <span className="text-gray-600">아이디</span>
-                      <span className="text-gray-900 font-medium">{userInfo.userId}</span>
+                      <span className="text-gray-900 font-medium">{userInfo?.userId}</span>
                     </div>
-                    <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                    <div className="flex justify-between items-center py-1">
                       <span className="text-gray-600">이름</span>
-                      <span className="text-gray-900 font-medium">{userInfo.name}</span>
+                      <span className="text-gray-900 font-medium">{userInfo?.name}</span>
                     </div>
-                    <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                    <div className="flex justify-between items-center py-1">
                       <span className="text-gray-600">휴대폰 번호</span>
-                      <span className="text-gray-900 font-medium">{userInfo.contact}</span>
+                      <span className="text-gray-900 font-medium">{userInfo?.contact}</span>
                     </div>
-                    <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                    <div className="flex justify-between items-center py-1">
                       <span className="text-gray-600">이메일 주소</span>
-                      <span className="text-gray-900 font-medium">{userInfo.email}</span>
+                      <span className="text-gray-900 font-medium">{userInfo?.email}</span>
                     </div>
                     {isExpert && (
                       <div className="flex justify-between items-center py-3">
                         <span className="text-gray-600">전문 자격 증명</span>
                         <div className="flex items-center space-x-2">
-                          <span className="text-gray-900 font-medium">{userInfo.qualification}</span>
-                          {userInfo.isApproved && (
+                          <span className="text-gray-900 font-medium">{userInfo?.qualification}</span>
+                          {userInfo?.isApproved && (
                             <>
                               <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -393,8 +583,8 @@ const MyPage = () => {
                 </div>
 
                 {/* 커뮤니티 프로필 Section */}
-                <div className="bg-white border border-gray-200 rounded-lg p-6">
-                  <div className="flex items-center justify-between mb-6">
+                <div className="bg-white p-6">
+                  <div className="flex items-center justify-between pb-4 mb-6 border-b border-gray-200">
                     <h2 className="text-xl font-semibold text-gray-900">커뮤니티 프로필</h2>
                     <button 
                       onClick={() => setShowProfileEditModal(true)}
@@ -405,16 +595,20 @@ const MyPage = () => {
                   </div>
                   
                   <div className="flex items-center space-x-3">
-                    <div className="w-12 h-12 bg-orange-400 rounded-full flex items-center justify-center">
-                      <span className="text-white text-lg font-medium">🦊</span>
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center">
+                      <img 
+                        src={getSelectedProfileImage()} 
+                        alt="profile" 
+                        className="w-10 h-10 rounded-full"
+                      />
                     </div>
-                    <span className="text-gray-900 font-medium">{userInfo.nickname}</span>
+                    <span className="text-gray-900 font-medium">{profileForm.nickname}</span>
                   </div>
                 </div>
 
                 {/* 회원탈퇴 Section */}
-                <div className="bg-white border border-gray-200 rounded-lg p-6">
-                  <div className="flex items-center justify-between mb-6">
+                <div className="bg-white p-6">
+                  <div className="flex items-center justify-between pb-4 mb-6 border-b border-gray-200">
                     <h2 className="text-xl font-semibold text-gray-900">회원탈퇴</h2>
                     <button 
                       onClick={() => setShowWithdrawalModal(true)}
@@ -477,15 +671,15 @@ const MyPage = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {consultationData[consultationTab as keyof typeof consultationData].map((item, index) => (
+                      {(consultationData[consultationTab] || tempConsultationData[consultationTab as keyof typeof tempConsultationData]).map((item: any, index: number) => (
                         <tr key={index} className="border-b border-gray-100">
                           <td className="px-4 py-3 text-left text-sm text-gray-900">{item.date}</td>
                           <td className="px-4 py-3 text-left text-sm text-gray-900">{item.time}</td>
                           <td className="px-4 py-3 text-left text-sm text-gray-900">{item.content}</td>
                           <td className="px-4 py-3 text-left text-sm text-gray-900">{item.expert}</td>
                           <td className="px-4 py-3 text-left">
-                            <button className="bg-gray-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-gray-600 transition-colors">
-                              {item.videoConsultation}
+                            <button className="bg-gray-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-gray-600 transition-colors" onClick={() => handleEnterConsultation(item)}>
+                            {item.videoConsultation}
                             </button>
                           </td>
                           <td className="px-4 py-3">
@@ -496,7 +690,7 @@ const MyPage = () => {
                           {consultationTab === '상담 완료' && (
                             <td className="px-4 py-3">
                               <button 
-                                onClick={() => handleConsultationDiaryClick(item)}
+                                onClick={() => handleEnterConsultation(item)}
                                 className="bg-blue-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-blue-600 transition-colors"
                               >
                                 상담일지
@@ -517,7 +711,7 @@ const MyPage = () => {
                 
                 {/* Expert Cards Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {expertCards.map((expert, index) => (
+                  {(favoriteExperts.length > 0 ? favoriteExperts : expertCards).map((expert, index) => (
                     <div key={index} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-shadow">
                       {/* Review Count */}
                       <div className="flex items-center mb-3">
@@ -529,7 +723,7 @@ const MyPage = () => {
 
                       {/* Tags */}
                       <div className="flex flex-wrap gap-1 mb-4">
-                        {expert.tags.map((tag, tagIndex) => (
+                        {(expert.tags || []).map((tag: any, tagIndex: number) => (
                           <span
                             key={tagIndex}
                             className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-md"
@@ -865,7 +1059,7 @@ const MyPage = () => {
               </button>
             </div>
             
-            <form className="space-y-6">
+            <form className="space-y-6" onSubmit={handlePasswordSubmit}>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">현재 비밀번호</label>
                 <input
@@ -926,7 +1120,7 @@ const MyPage = () => {
               </button>
             </div>
             
-            <form className="space-y-6">
+            <form className="space-y-6" onSubmit={handleEditInfoSubmit}>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">이름</label>
                 <input
@@ -984,20 +1178,24 @@ const MyPage = () => {
               </button>
             </div>
             
-            <form className="space-y-6">
+            <form className="space-y-6" onSubmit={handleProfileSubmit}>
               <div>
-                <label className="block text-sm font-bold text-gray-900 mb-4">프로필 이미지</label>
-                <div className="grid grid-cols-3 gap-4 mb-4">
+                <label className="block text-left text-m font-bold text-gray-900 mb-4">프로필 이미지</label>
+                <div className="grid grid-cols-4 gap-4 mb-4">
                   {avatarOptions.map((avatar) => (
                     <button
                       key={avatar.id}
                       type="button"
                       onClick={() => setProfileForm({ ...profileForm, selectedAvatar: avatar.id })}
-                      className={`w-16 h-16 ${avatar.color} rounded-full flex items-center justify-center text-2xl hover:scale-110 transition-transform ${
+                      className={`w-16 h-16 rounded-full flex items-center justify-center hover:scale-110 transition-transform ${
                         profileForm.selectedAvatar === avatar.id ? 'ring-4 ring-blue-500' : ''
                       }`}
                     >
-                      {avatar.icon}
+                      <img 
+                        src={avatar.image} 
+                        alt={avatar.id} 
+                        className="w-14 h-14 rounded-full"
+                      />
                     </button>
                   ))}
                   <button
@@ -1010,7 +1208,7 @@ const MyPage = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-bold text-gray-900 mb-2">닉네임</label>
+                <label className="block text-left text-m font-bold text-gray-900 mb-2">닉네임</label>
                 <input
                   type="text"
                   name="nickname"
@@ -1053,7 +1251,7 @@ const MyPage = () => {
               </div>
               <div className="flex justify-end space-x-3 pt-4">
                 <button
-                  onClick={() => setShowWithdrawalModal(false)}
+                  onClick={handleWithdrawalSubmit}
                   className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
                 >
                   회원탈퇴

@@ -1,16 +1,42 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import stalkLogoBlue from '@/assets/images/logos/Stalk_logo_blue.svg';
+import profileDefault from '@/assets/images/profiles/Profile_default.svg';
+import newsIcon from '@/assets/images/icons/news_icon.png';
+import mortarboardIcon from '@/assets/images/icons/mortarboard_icon.png';
+import { useAuth } from '@/context/AuthContext';
 
 const HomePageNavbar: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
+  const { isLoggedIn, logout } = useAuth();
   const [showProfileMenu, setShowProfileMenu] = useState<boolean>(false);
   const [showCommunityMenu, setShowCommunityMenu] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [communityMenuTimeout, setCommunityMenuTimeout] = useState<number | null>(null);
   const [isInputActive, setIsInputActive] = useState<boolean>(false); // 마우스 이벤트 상태 관리
   const [isNavBarScrolled, setIsNavBarScrolled] = useState<boolean>(false); // 스크롤 상태 관리
+  const [userProfileImage, setUserProfileImage] = useState<string>(''); // 사용자 프로필 이미지
+
+  // 사용자 프로필 이미지 가져오기
+  const fetchUserProfileImage = async () => {
+    try {
+      // 실제 API 호출 (임시로 localStorage에서 user_id를 가져온다고 가정)
+      const userId = localStorage.getItem('userId') || '1'; // 임시 user_id
+      
+      // API 호출 예시 (실제 엔드포인트로 수정 필요)
+      const response = await fetch(`/api/user_community_images?user_id=${userId}`);
+      const data = await response.json();
+      
+      if (data.image_path) {
+        setUserProfileImage(data.image_path);
+      } else {
+        setUserProfileImage(profileDefault);
+      }
+    } catch (error) {
+      console.error('프로필 이미지 로드 실패:', error);
+      setUserProfileImage(profileDefault);
+    }
+  };
 
   // 스크롤 상태 변경 함수
   const handleScroll = (): void => {
@@ -56,22 +82,22 @@ const HomePageNavbar: React.FC = () => {
     setIsInputActive(false); // 입력창에서 마우스가 빠져나갔을 때 비활성화
   };
 
-  // 로그인 상태 확인
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  // AuthContext에서 로그인 상태를 가져오므로 별도의 로그인 상태 관리 제거
 
+
+
+  // 로그인 상태가 변경될 때 프로필 이미지 가져오기
   useEffect(() => {
-    const fromPath = ['/mypage', '/settings', '/consultations', '/favorites'].some(path =>
-      location.pathname.startsWith(path)
-    );
-
-    const fromLocalStorage = localStorage.getItem('isLoggedIn') === 'true';
-
-    setIsLoggedIn(fromPath || fromLocalStorage);
-  }, [location.pathname]);
+    if (isLoggedIn) {
+      fetchUserProfileImage();
+    } else {
+      setUserProfileImage('');
+    }
+  }, [isLoggedIn]);
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-10 ${isNavBarScrolled ? 'text-gray-900 bg-white' : 'text-white'}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="sm:px-10 lg:px-16">
         <div className="flex justify-between items-center h-20">
           {/* Brand Logo */}
           <div className="flex items-center">
@@ -84,7 +110,7 @@ const HomePageNavbar: React.FC = () => {
           </div>
 
           {/* Navigation Menu */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-10">
             <button 
               onClick={() => navigate('/experts')}
               className="hover:font-semibold hover:text-blue-500 font-medium text-lg transition-all duration-300 relative group"
@@ -132,7 +158,8 @@ const HomePageNavbar: React.FC = () => {
                     }}
                     className="w-full px-4 py-3 text-left text-gray-700 hover:bg-blue-50 hover:text-blue-500 transition-colors flex items-center space-x-3"
                   >
-                    뉴스
+                    <img src={newsIcon} alt="뉴스" className="w-5 h-5" />
+                    <span>뉴스</span>
                   </button>
                   <button
                     onClick={() => {
@@ -141,7 +168,8 @@ const HomePageNavbar: React.FC = () => {
                     }}
                     className="w-full px-4 py-3 text-left text-gray-700 hover:bg-blue-50 hover:text-blue-500 transition-colors flex items-center space-x-3"
                   >
-                    자유게시판
+                    <img src={mortarboardIcon} alt="투자 지식" className="w-5 h-5" />
+                    <span>투자 지식iN</span>
                   </button>
                 </div>
               )}
@@ -151,41 +179,46 @@ const HomePageNavbar: React.FC = () => {
           {/* Search Bar and User Actions */}
           <div className="flex items-center space-x-4">
             {/* Search Bar */}
-            <div className="bg-gray-50 hover:bg-white border border-gray-200 hover:border-blue-300 rounded-full px-4 py-2 flex items-center space-x-3 w-80 transition-all duration-300 shadow-soft group-hover:shadow-modern">
-              <div className="relative group" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-                <input
-                  type="text"
-                  placeholder="원하는 검색어를 입력하세요"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  className={`bg-transparent outline-none text-gray-600 placeholder-gray-400 text-sm flex-1 border-none focus:outline-none focus:ring-0 ${isInputActive ? '' : 'pointer-events-none'}`}
-                  readOnly={!isInputActive}
-                />
-                <button 
-                  onClick={handleSearch} 
-                  className="p-1 hover:bg-gray-100 rounded-full transition-colors duration-300 inline-flex item-center justify-center"
-                >
-                  <svg className="w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </button>
-              </div>
+            <div className="bg-gray-50 hover:bg-white border border-gray-200 hover:border-blue-300 rounded-full px-4 py-2 flex items-center space-x-3 w-80 transition-all duration-300 shadow-soft group-hover:shadow-modern" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+              <input
+                type="text"
+                placeholder="원하는 검색어를 입력하세요"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={handleKeyPress}
+                className={`ml-2 bg-transparent outline-none text-gray-600 placeholder-gray-400 text-sm flex-1 border-none focus:outline-none focus:ring-0 ${isInputActive ? '' : 'pointer-events-none'}`}
+                readOnly={!isInputActive}
+              />
+              <button 
+                onClick={handleSearch} 
+                className="p-1 hover:bg-gray-100 rounded-full transition-colors duration-300 inline-flex item-center justify-center"
+              >
+                <svg className="w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </button>
+              
             </div>
             {/* User Actions */}
             {isLoggedIn ? (
               <div className="relative">
-                <button onClick={() => setShowProfileMenu(!showProfileMenu)} className="flex items-center space-x-2 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-full px-4 py-2 hover:bg-white hover:shadow-modern transition-all duration-300">
-                  <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center text-white text-sm font-semibold">김</div>
-                  <span className="text-gray-700 font-medium text-sm">김사용자</span>
-                  <svg className={`w-4 h-4 text-gray-500 transition-transform duration-300 ${showProfileMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+                <button 
+                  onClick={() => setShowProfileMenu(!showProfileMenu)} 
+                  className="w-11 h-11 rounded-full overflow-hidden hover:shadow-modern transition-all duration-300 hover:scale-105"
+                >
+                  <img 
+                    src={userProfileImage || profileDefault} 
+                    alt="Profile" 
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = profileDefault;
+                    }}
+                  />
                 </button>
 
                 {/* Profile Dropdown Menu */}
                 {showProfileMenu && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white/90 backdrop-blur-xl rounded-2xl shadow-glow border border-white/20 py-2 z-50">
+                  <div className="absolute right-0 mt-2 w-48 bg-white/90 backdrop-blur-xl rounded-2xl border border-white/20 py-2 z-50">
                     <button
                       onClick={() => {
                         navigate('/mypage');
@@ -224,17 +257,15 @@ const HomePageNavbar: React.FC = () => {
                     </button>
                     <div className="border-t border-gray-200 my-1"></div>
                     <button
-                      onClick={() => {
-                        // 1. 로그인 상태 제거
-                        localStorage.removeItem('isLoggedIn');
-
-                        // 2. 상태 초기화
-                        setShowProfileMenu(false);
-                        setIsLoggedIn(false); // 이 state는 useState로 선언되어 있어야 함
-
-                        // 3. 홈으로 이동
-                        navigate('/');
-                        window.scrollTo({ top: 0, behavior: 'smooth'});
+                      onClick={async () => {
+                        try {
+                          await logout();
+                          setShowProfileMenu(false);
+                          navigate('/');
+                          window.scrollTo({ top: 0, behavior: 'smooth'});
+                        } catch (error) {
+                          console.error('로그아웃 실패:', error);
+                        }
                       }}
                       className="w-full px-4 py-3 text-left text-red-600 hover:bg-red-50 transition-colors flex items-center space-x-3"
                     >
